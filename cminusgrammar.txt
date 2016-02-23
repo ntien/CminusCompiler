@@ -1,0 +1,339 @@
+﻿1. translation_unit
+	: compilerdir_or_external_declaration { compilerdir_or_external_declaration }
+
+
+2. compilerdir_or_external_declaration
+	: define_directive
+	| external_declaration
+	
+
+3. define_directive
+	: POUND DEFINE define_body 
+
+
+4. define_body
+	: IDENTIFIER CONST
+	| IDENTIFIER STRING_LITERAL
+
+
+5. external_declaration
+	: function_definition
+	| declaration
+
+	
+6. function_definition
+	: type_specifier declarator function_definition_next
+	| declarator function_definition_next
+
+		
+7. function_definition_next
+	: declaration_list compound_statement
+	| compound_statement
+
+
+8. declaration
+	: declaration_specifiers SEMICOLON { declaration_specifiers SEMICOLON }
+
+
+9. declaration_specifiers
+	: type_qualifier_specifier init_declarator_list 
+	| TYPEDEF type_specifier
+
+
+10. type_qualifier_specifier
+	: type_qualifier type_specifier
+	| type_specifier
+
+
+11. type_qualifier
+	: CONST	
+
+
+12. type_specifier
+	: VOID
+	| CHAR	
+	| INT
+	| struct_specifier
+	| TYPE_NAME
+		
+
+13. init_declarator_list
+	: init_declarator {COMMA init_declarator}
+	
+
+
+14. init_declarator
+	: declarator 
+	| declarator EQ_OP initializer
+
+	
+15. declarator
+	: pointer direct_declarator
+	| direct_declarator
+
+
+16. direct_declarator
+	: IDENTIFIER
+	| OPEN_PAREN direct_declarator_next1
+	| OPEN_BRACKET direct_declarator_next2
+
+
+17. direct_declarator_next1
+	: declarator CLOSE_PAREN
+	| parameter_list CLOSE_PAREN direct_declarator
+	| identifier_list CLOSE_PAREN direct_declarator
+	| CLOSE_PAREN direct_declarator
+
+
+18. direct_declarator_next2
+	: logical_or_expression CLOSE_BRACKET direct_declarator
+	| CLOSE_BRACKET direct_declarator
+
+
+19. parameter_list
+	: parameter_declaration { COMMA parameter_declaration}
+
+
+20. parameter_declaration
+	: declaration_specifiers parameter_declaration_next
+
+	
+21. parameter_declaration_next
+	: declarator
+	| abstract_declarator
+	| EPSILON
+
+
+22. identifier_list
+	: IDENTIFIER {COMMA IDENTIFIER}
+
+	
+23. initializer
+	: assignment_expression
+	| OPEN_BRACE 0 CLOSE_BRACE 
+		
+
+24. type_name
+	: type_qualifier_specifier type_name_next
+
+	
+25. type_name_next
+	: abstract_declarator
+	| EPSILON
+
+
+26. abstract_declarator
+	: pointer abstract_declarator_next
+	| direct_abstract_declarator
+
+	
+27. abstract_declarator_next
+	: direct_abstract_declarator
+	| EPSILON
+
+
+28. direct_abstract_declarator
+	: OPEN_PAREN direct_abstract_declarator_next1 {direct_abstract_declarator_next3}
+	| OPEN_BRACKET direct_abstract_declarator_next2 {direct_abstract_declarator_next3}
+		
+
+29. direct_abstract_declarator_next1
+	: abstract_declarator CLOSE_PAREN
+	| CLOSE_PAREN
+	| parameter_list CLOSE_PAREN
+
+	
+30. direct_abstract_declarator_next2
+	: CLOSE_BRACKET
+	| logical_or_expression CLOSE_BRACKET
+
+
+31. direct_abstract_declarator_next3
+	: OPEN_BRACKET direct_abstract_declarator_next2
+	| OPEN_PAREN direct_abstract_declarator_next4
+
+	
+32. direct_abstract_declarator_next4
+	: CLOSE_PAREN
+	| parameter_list CLOSE_PAREN
+
+
+33. struct_specifier
+	: STRUCT struct_specifier_next
+
+
+34. struct_specifier_next
+	: IDENTIFIER 
+	| IDENTIFIER OPEN_BRACE struct_declaration_list CLOSE_BRACE
+	| OPEN_BRACE struct_declaration_list CLOSE_BRACE
+
+
+35. struct_declaration_list
+	: struct_declaration {struct_declaration}
+	
+
+36. struct_declaration
+	: type_specifier struct_declarator_list SEMICOLON
+
+
+37. struct_declarator_list
+	: declarator {COMMA declarator}
+
+
+38. enum_specifier
+	: ENUM OPEN_BRACE enumerator_list CLOSE_BRACE
+
+	
+39. enumerator_list
+	: IDENTIFIER {COMMA IDENTIFIER }
+
+
+40. pointer
+	: POINTER pointer_next
+
+	
+41. pointer_next
+	: type_qualifier pointer
+	: type_qualifier 
+	| pointer
+	| EPSILON
+
+
+42. primary_expression
+	: IDENTIFIER
+	| CONSTANT
+	| STRING_LITERAL
+	| OPEN_PAREN expression CLOSE_PAREN
+	
+
+43. postfix_expression
+	: primary_expression {postfix_expression_next}
+
+44. postfix_expression_next
+	: OPEN_BRACKET expression CLOSE_BRACKET
+	| OPEN_PAREN postfix_expression_next_brace
+	| PERIOD IDENTIFIER
+	| PTR_OP IDENTIFIER
+	| INC_OP
+	| DEC_OP
+
+
+45. postfix_expression_next_brace
+	: CLOSE_PAREN
+	| argument_expression_list CLOSE_PAREN
+
+
+46. argument_expression_list
+	: assignment_expression {COMMA assignment_expression}
+
+
+47. unary_expression
+	: postfix_expression
+	| INC_OP unary_expression
+	| DEC_OP unary_expression
+	| unary_operator unary_expression
+	| SIZEOF unary_expression_sizeof
+
+
+48. unary_expression_sizeof
+	: OPEN_PAREN type_specifier CLOSE_PAREN
+	| OPEN_PAREN IDENTIFIER CLOSE_PAREN
+	
+
+49. unary_operator
+	: ADDRESS_OP
+	| POINTER
+	| POS 
+	| NEG	
+	| NOT 
+
+
+50. multiplicative_expression
+	: unary_expression {(MULT|DIVIDE|MOD) unary_expression}
+
+
+51. additive_expression
+	: multiplicative_expression {(PLUS|MINUS) multiplicative_expression}
+
+
+
+52. relational_expression
+	: additive_expression {(L_OP |G_OP |LE_OP |GE_OP)  additive_expression}
+
+
+53. equality_expression
+	: relational_expression {(EQ_OP |NE_OP) relational_expression}
+
+	
+54. logical_and_expression
+	: equality_expression {AND_OP equality_expression}
+
+	
+55. logical_or_expression
+	: logical_and_expression {OR_OP logical_and_expression}
+
+
+56. assignment_expression
+	: unary_expression EQ_OP assignment_expression
+	
+
+57. expression
+	: assignment_expression {COMMA assignment_expression}
+
+	
+58. statement
+	: compound_statement
+	| expression_statement
+	| selection_statement
+	| iteration_statement
+	| jump_statement
+
+
+59. compound_statement
+	: OPEN_BRACE compound_statement_next
+
+
+60. compound_statement_next
+	: CLOSE_BRACE
+	| statement_list CLOSE_BRACE
+	| declaration_list compound_statement_next1
+
+	
+61. compound_statement_next1
+	: CLOSE_BRACE
+	| statement_list CLOSE_BRACE
+	
+
+62. statement_list
+	: statement {statement}
+	
+
+63. declaration_list
+	: declaration {declaration}
+	
+
+64. expression_statement
+	: SEMICOLON
+	| expression SEMICOLON
+
+	
+65. selection_statement
+	: IF OPEN_PAREN expression CLOSE_PAREN statement selection_statement_next
+
+
+66. selection_statement_next
+	: ELSE statement
+	| EPSILON		
+
+
+67. iteration_statement
+	: WHILE OPEN_PAREN expression CLOSE_PAREN statement
+
+
+68. jump_statement
+	:CONTINUE SEMICOLON
+	| BREAK SEMICOLON
+	| RETURN SEMICOLON
+	| RETURN expression SEMICOLON
+
+	

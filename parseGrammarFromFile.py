@@ -19,12 +19,12 @@ def put_grammar_into_list():
       if re.search('[0-9]+\.', line) is not None:
         if len(rule) > 0 and len(name) > 0:
           rules.append(name)
-          rules_dict[name] = rule 
-          rule.append(re.split('[0-9]+\.', line)[1])
+          rules_dict[name] = rule
+        name = re.split('[0-9]+\.', line)[1]
+        rule = []
       else:
         if line!="" and line!=" ":
-          rule.append(line)
-          value.append(line)
+          rule.append(line.split(" "))
   return rules_dict
   #new_filename = raw_input("Where would you like to store the grammar (now in list format)?")
   #with open(new_filename, 'w') as f:
@@ -39,6 +39,7 @@ def check_if_pairwise_disjoint(l):
 
 if __name__=="__main__":
   l = put_grammar_into_list()
+  print l
   disjoint = check_if_pairwise_disjoint(l)
   print disjoint  
 

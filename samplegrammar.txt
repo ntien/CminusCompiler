@@ -1,0 +1,30 @@
+1. nonterminala
+	: A nonterminalb1
+    | nonterminalb2 A
+    | B21 nonterminalb3
+
+2. nonterminalb1
+    : nonterminalc2 nonterminalc2
+    | nonterminalc3 nonterminalb2
+
+3. nonterminalb2
+	: B21 nonterminalc1
+    | B22 nonterminalc2  
+
+
+4. nonterminalb3
+	: B31 nonterminalc1 
+    | B32 nonterminalc2
+    | B33 nonterminalc1 nonterminalc2
+
+5. nonterminalc1
+    : C1 C2
+    | C1 nonterminalc2
+
+6. nonterminalc2
+    : C2 C3
+    | C3 C2
+
+7. nonterminalc3
+    : nonterminalc2 C3
+    | C3 

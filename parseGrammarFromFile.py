@@ -36,12 +36,21 @@ def put_grammar_into_list():
   return rules_dict, rules, visited_dict
 
 #this only checks rules that are called, eventually, by the first rule ("start")
-def check_if_pairwise_disjoint(rules_dict, rules_list):
+def check_if_pairwise_disjoint(rules_dict):
 #This function takes the dictionary of rules and checks that the first terminal of each rule's right-hand-side-rules are different (pairwise disjoint)''' 
 #first: build set of all first tokens of each rule and put into dictionary
 #then: check that the right-hand-sides of each rule has disjoint sets
-   start = rules_list[0]
-   right_hand_side = rules_dict[start] 
+  first_tokens_of_each_rule = build_set_of_right_side_terminals(rules_dict, {})
+  for key in rules_dict:
+    rhs = rules_dict[key] #rhs = right hand side
+    terminals = []
+    for item in rhs:
+      for element in item:
+        if is_terminal(element):
+          terminals.append(element)   
+        else:  
+          
+           
    first_tokens_of_each_rule = build_set_of_right_side_terminals(rules_dict, start, {})
    print first_tokens_of_each_rule[1]
    return False 
@@ -71,7 +80,7 @@ def is_terminal(token):
 
 if __name__=="__main__":
   l = put_grammar_into_list()
-  disjoint = check_if_pairwise_disjoint(l[0],l[1])
+  disjoint = check_if_pairwise_disjoint(l[0])
 
 
 

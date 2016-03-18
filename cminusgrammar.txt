@@ -17,16 +17,18 @@
 
 
 5. external_declaration
-	: function_definition
-	| declaration
+    : type_specifier external_next
+    | direct_declarator function_definition
+    | type_qualifier type_specifier init_declarator_list SEMICOLON { declaration_specifiers SEMICOLON }
+    | TYPEDEF type_specifier SEMICOLON { declaration_specifiers SEMICOLON }
 
+
+6. external_next
+    : init_declarator_list SEMICOLON { declaration_specifiers SEMICOLON }
+    | direct_declarator function_definition
 	
-6. function_definition
-	: type_specifier direct_declarator function_definition_next
-	| direct_declarator function_definition_next
-
 		
-7. function_definition_next
+7. function_definition
 	: declaration_list compound_statement
 	| compound_statement
 
@@ -66,150 +68,148 @@
 	: EQ_OP initializer
 	| EPSILON
 
-16. direct_declarator
+17. direct_declarator
 	: IDENTIFIER
 	| OPEN_PAREN direct_declarator_next1
 	| OPEN_BRACKET direct_declarator_next2
 
 
-17. direct_declarator_next1
+18. direct_declarator_next1
 	: pointer direct_declarator CLOSE_PAREN
 	| parameter_list CLOSE_PAREN direct_declarator
 	| identifier_list CLOSE_PAREN direct_declarator
 	| CLOSE_PAREN direct_declarator
 
 
-18. direct_declarator_next2
+19. direct_declarator_next2
 	: logical_or_expression CLOSE_BRACKET direct_declarator
 	| CLOSE_BRACKET direct_declarator
 
 
-19. parameter_list
+20. parameter_list
 	: parameter_declaration { COMMA parameter_declaration}
 
 
-20. parameter_declaration
+21. parameter_declaration
 	: declaration_specifiers parameter_declaration_next
 
 	
-21. parameter_declaration_next
+22. parameter_declaration_next
 	: pointer choose_declarator
 	| EPSILON
 
 
-22. choose_declarator
+23. choose_declarator
 	: direct_declarator
 	| abstract_declarator
 
-22. identifier_list
+24. identifier_list
 	: IDENTIFIER { COMMA IDENTIFIER }
 
 	
-23. initializer
+25. initializer
 	: assignment_expression
 	| OPEN_BRACE ZERO CLOSE_BRACE 
 		
 
-24. type_name
+26. type_name
 	: type_qualifier_specifier type_name_next
 
 	
-25. type_name_next
+27. type_name_next
 	: pointer abstract_declarator
 	| EPSILON
 
-26. abstract_declarator
+28. abstract_declarator
 	: abstract_declarator_next
 	| direct_abstract_declarator	
 
-27. abstract_declarator_next
+29. abstract_declarator_next
 	: direct_abstract_declarator
 	| EPSILON
 
 
-28. direct_abstract_declarator
+30. direct_abstract_declarator
 	: OPEN_PAREN direct_abstract_declarator_next1 { direct_abstract_declarator_next3 }
 	| OPEN_BRACKET direct_abstract_declarator_next2 { direct_abstract_declarator_next3 }
 		
 
-29. direct_abstract_declarator_next1
+31. direct_abstract_declarator_next1
 	: pointer abstract_declarator CLOSE_PAREN
 	| CLOSE_PAREN
 	| parameter_list CLOSE_PAREN
 
 	
-30. direct_abstract_declarator_next2
+32. direct_abstract_declarator_next2
 	: CLOSE_BRACKET
 	| logical_or_expression CLOSE_BRACKET
 
 
-31. direct_abstract_declarator_next3
+33. direct_abstract_declarator_next3
 	: OPEN_BRACKET direct_abstract_declarator_next2
 	| OPEN_PAREN direct_abstract_declarator_next4
 
 	
-32. direct_abstract_declarator_next4
+34. direct_abstract_declarator_next4
 	: CLOSE_PAREN
 	| parameter_list CLOSE_PAREN
 
 
-33. struct_specifier
+35. struct_specifier
 	: STRUCT struct_specifier_next
 
 
-34. struct_specifier_next
+36. struct_specifier_next
 	: IDENTIFIER struct_specifier_cont 
 	| OPEN_BRACE struct_declaration_list CLOSE_BRACE
-TODO
-struct_specifier_cont
+
+37. struct_specifier_cont
 	: OPEN_BRACE struct_declaration_list CLOSE_BRACE
 	| EPSILON
 
-35. struct_declaration_list
+38. struct_declaration_list
 	: struct_declaration { struct_declaration }
 	
 
-36. struct_declaration
+39. struct_declaration
 	: type_specifier struct_declarator_list SEMICOLON
 
 
-37. struct_declarator_list
+40. struct_declarator_list
 	: direct_declarator { COMMA direct_declarator }
 
 
-38. enum_specifier
+41. enum_specifier
 	: ENUM OPEN_BRACE enumerator_list CLOSE_BRACE
 
 	
-39. enumerator_list
+42. enumerator_list
 	: IDENTIFIER { COMMA IDENTIFIER }
 
 
-40. pointer
+43. pointer
 	: POINTER pointer_next
 
 	
-41. pointer_next
+44. pointer_next
 	: type_qualifier optional_pointer
 	| pointer
 	| EPSILON
 
-TODO
-  optional_pointer
+45. optional_pointer
   	: pointer
 	| EPSILON
 
-42. primary_expression
+46. primary_expression
 	: IDENTIFIER
 	| CONSTANT
 	| STRING_LITERAL
 	| OPEN_PAREN expression CLOSE_PAREN
 	
-
-43. postfix_expression
+47. postfix_expression
 	: primary_expression { postfix_expression_next }
 
-44. postfix_expression_next
+48. postfix_expression_next
 	: OPEN_BRACKET expression CLOSE_BRACKET
 	| OPEN_PAREN postfix_expression_next_brace
 	| PERIOD IDENTIFIER
@@ -217,17 +217,16 @@ TODO
 	| INC_OP
 	| DEC_OP
 
-
-45. postfix_expression_next_brace
+49. postfix_expression_next_brace
 	: CLOSE_PAREN
 	| argument_expression_list CLOSE_PAREN
 
 
-46. argument_expression_list
+50. argument_expression_list
 	: assignment_expression { COMMA assignment_expression }
 
 
-47. unary_expression
+51. unary_expression
 	: postfix_expression
 	| INC_OP unary_expression
 	| DEC_OP unary_expression
@@ -235,15 +234,14 @@ TODO
 	| SIZEOF unary_expression_sizeof
 
 
-48. unary_expression_sizeof
+52. unary_expression_sizeof
 	: OPEN_PAREN unary_expression_sizeof_cont
 	
-TODO
-  unary_expression_sizeof_cont
+53. unary_expression_sizeof_cont
 	: type_specifier CLOSE_PAREN
 	| IDENTIFIER CLOSE_PAREN
 
-49. unary_operator
+54. unary_operator
 	: ADDRESS_OP
 	| POINTER
 	| POS 
@@ -251,40 +249,40 @@ TODO
 	| NOT 
 
 
-50. multiplicative_expression
+55. multiplicative_expression
 	: unary_expression { (MULT|DIVIDE|MOD) unary_expression }
 
 
-51. additive_expression
+56. additive_expression
 	: multiplicative_expression { (PLUS|MINUS) multiplicative_expression }
 
 
 
-52. relational_expression
+57. relational_expression
 	: additive_expression { (L_OP|G_OP|LE_OP|GE_OP)  additive_expression }
 
 
-53. equality_expression
+58. equality_expression
 	: relational_expression { (EQ_OP|NE_OP) relational_expression }
 
 	
-54. logical_and_expression
+59. logical_and_expression
 	: equality_expression { AND_OP equality_expression }
 
 	
-55. logical_or_expression
+60. logical_or_expression
 	: logical_and_expression { OR_OP logical_and_expression }
 
 
-56. assignment_expression
+61. assignment_expression
 	: unary_expression { EQ_OP assignment_expression }
 	
 
-57. expression
+62. expression
 	: assignment_expression { COMMA assignment_expression }
 
 	
-58. statement
+63. statement
 	: compound_statement
 	| expression_statement
 	| selection_statement
@@ -292,53 +290,52 @@ TODO
 	| jump_statement
 
 
-59. compound_statement
+64. compound_statement
 	: OPEN_BRACE compound_statement_next
 
 
-60. compound_statement_next
+65. compound_statement_next
 	: CLOSE_BRACE
 	| statement_list CLOSE_BRACE
 	| declaration_list compound_statement_next1
 
 	
-61. compound_statement_next1
+66. compound_statement_next1
 	: CLOSE_BRACE
 	| statement_list CLOSE_BRACE
 	
 
-62. statement_list
+67. statement_list
 	: statement { statement }
 	
 
-63. declaration_list
+68. declaration_list
 	: declaration { declaration }
 	
 
-64. expression_statement
+69. expression_statement
 	: SEMICOLON
 	| expression SEMICOLON
 
 	
-65. selection_statement
+70. selection_statement
 	: IF OPEN_PAREN expression CLOSE_PAREN statement selection_statement_next
 
 
-66. selection_statement_next
+71. selection_statement_next
 	: ELSE statement
 	| EPSILON		
 
 
-67. iteration_statement
+73. iteration_statement
 	: WHILE OPEN_PAREN expression CLOSE_PAREN statement
 
 
-68. jump_statement
+74. jump_statement
 	:CONTINUE SEMICOLON
 	| BREAK SEMICOLON
 	| jump_return
 
-TODO
-jump_return
+75. jump_return
 	: SEMICOLON
 	| expression SEMICOLON

@@ -8,12 +8,12 @@
 	
 
 3. define_directive
-	: POUND DEFINE define_body 
+	: POUND DEFINE IDENTIFIER define_type 
 
 
-4. define_body
-	: IDENTIFIER CONST
-	| IDENTIFIER STRING_LITERAL
+4. define_type
+	: CONST
+	| STRING_LITERAL
 
 
 5. external_declaration
@@ -22,8 +22,8 @@
 
 	
 6. function_definition
-	: type_specifier declarator function_definition_next
-	| declarator function_definition_next
+	: type_specifier direct_declarator function_definition_next
+	| direct_declarator function_definition_next
 
 		
 7. function_definition_next
@@ -58,19 +58,13 @@
 		
 
 13. init_declarator_list
-	: init_declarator { COMMA init_declarator }
+	: direct_declarator init_declarator { COMMA direct_declarator init_declarator }
 	
 
 
 14. init_declarator
-	: declarator 
-	| declarator EQ_OP initializer
-
-	
-15. declarator
-	: pointer direct_declarator
-	| direct_declarator
-
+	: EQ_OP initializer
+	| EPSILON
 
 16. direct_declarator
 	: IDENTIFIER
@@ -79,7 +73,7 @@
 
 
 17. direct_declarator_next1
-	: declarator CLOSE_PAREN
+	: pointer direct_declarator CLOSE_PAREN
 	| parameter_list CLOSE_PAREN direct_declarator
 	| identifier_list CLOSE_PAREN direct_declarator
 	| CLOSE_PAREN direct_declarator
@@ -99,10 +93,13 @@
 
 	
 21. parameter_declaration_next
-	: declarator
-	| abstract_declarator
+	: pointer choose_declarator
 	| EPSILON
 
+
+22. choose_declarator
+	: direct_declarator
+	| abstract_declarator
 
 22. identifier_list
 	: IDENTIFIER { COMMA IDENTIFIER }
@@ -118,15 +115,13 @@
 
 	
 25. type_name_next
-	: abstract_declarator
+	: pointer abstract_declarator
 	| EPSILON
 
-
 26. abstract_declarator
-	: pointer abstract_declarator_next
-	| direct_abstract_declarator
+	: abstract_declarator_next
+	| direct_abstract_declarator	
 
-	
 27. abstract_declarator_next
 	: direct_abstract_declarator
 	| EPSILON
@@ -138,7 +133,7 @@
 		
 
 29. direct_abstract_declarator_next1
-	: abstract_declarator CLOSE_PAREN
+	: pointer abstract_declarator CLOSE_PAREN
 	| CLOSE_PAREN
 	| parameter_list CLOSE_PAREN
 
@@ -163,10 +158,12 @@
 
 
 34. struct_specifier_next
-	: IDENTIFIER 
-	| IDENTIFIER OPEN_BRACE struct_declaration_list CLOSE_BRACE
+	: IDENTIFIER struct_specifier_cont 
 	| OPEN_BRACE struct_declaration_list CLOSE_BRACE
-
+TODO
+struct_specifier_cont
+	: OPEN_BRACE struct_declaration_list CLOSE_BRACE
+	| EPSILON
 
 35. struct_declaration_list
 	: struct_declaration { struct_declaration }
@@ -177,7 +174,7 @@
 
 
 37. struct_declarator_list
-	: declarator { COMMA declarator }
+	: direct_declarator { COMMA direct_declarator }
 
 
 38. enum_specifier
@@ -193,11 +190,14 @@
 
 	
 41. pointer_next
-	: type_qualifier pointer
-	: type_qualifier 
+	: type_qualifier optional_pointer
 	| pointer
 	| EPSILON
 
+TODO
+  optional_pointer
+  	: pointer
+	| EPSILON
 
 42. primary_expression
 	: IDENTIFIER
@@ -236,9 +236,12 @@
 
 
 48. unary_expression_sizeof
-	: OPEN_PAREN type_specifier CLOSE_PAREN
-	| OPEN_PAREN IDENTIFIER CLOSE_PAREN
+	: OPEN_PAREN unary_expression_sizeof_cont
 	
+TODO
+  unary_expression_sizeof_cont
+	: type_specifier CLOSE_PAREN
+	| IDENTIFIER CLOSE_PAREN
 
 49. unary_operator
 	: ADDRESS_OP
@@ -333,7 +336,9 @@
 68. jump_statement
 	:CONTINUE SEMICOLON
 	| BREAK SEMICOLON
-	| RETURN SEMICOLON
-	| RETURN expression SEMICOLON
+	| jump_return
 
-	
+TODO
+jump_return
+	: SEMICOLON
+	| expression SEMICOLON

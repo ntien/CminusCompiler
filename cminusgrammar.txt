@@ -58,7 +58,7 @@
 		
 
 13. init_declarator_list
-	: init_declarator {COMMA init_declarator}
+	: init_declarator { COMMA init_declarator }
 	
 
 
@@ -105,12 +105,12 @@
 
 
 22. identifier_list
-	: IDENTIFIER {COMMA IDENTIFIER}
+	: IDENTIFIER { COMMA IDENTIFIER }
 
 	
 23. initializer
 	: assignment_expression
-	| OPEN_BRACE 0 CLOSE_BRACE 
+	| OPEN_BRACE ZERO CLOSE_BRACE 
 		
 
 24. type_name
@@ -133,8 +133,8 @@
 
 
 28. direct_abstract_declarator
-	: OPEN_PAREN direct_abstract_declarator_next1 {direct_abstract_declarator_next3}
-	| OPEN_BRACKET direct_abstract_declarator_next2 {direct_abstract_declarator_next3}
+	: OPEN_PAREN direct_abstract_declarator_next1 { direct_abstract_declarator_next3 }
+	| OPEN_BRACKET direct_abstract_declarator_next2 { direct_abstract_declarator_next3 }
 		
 
 29. direct_abstract_declarator_next1
@@ -169,7 +169,7 @@
 
 
 35. struct_declaration_list
-	: struct_declaration {struct_declaration}
+	: struct_declaration { struct_declaration }
 	
 
 36. struct_declaration
@@ -177,7 +177,7 @@
 
 
 37. struct_declarator_list
-	: declarator {COMMA declarator}
+	: declarator { COMMA declarator }
 
 
 38. enum_specifier
@@ -185,7 +185,7 @@
 
 	
 39. enumerator_list
-	: IDENTIFIER {COMMA IDENTIFIER }
+	: IDENTIFIER { COMMA IDENTIFIER }
 
 
 40. pointer
@@ -207,7 +207,7 @@
 	
 
 43. postfix_expression
-	: primary_expression {postfix_expression_next}
+	: primary_expression { postfix_expression_next }
 
 44. postfix_expression_next
 	: OPEN_BRACKET expression CLOSE_BRACKET
@@ -224,7 +224,7 @@
 
 
 46. argument_expression_list
-	: assignment_expression {COMMA assignment_expression}
+	: assignment_expression { COMMA assignment_expression }
 
 
 47. unary_expression
@@ -249,36 +249,36 @@
 
 
 50. multiplicative_expression
-	: unary_expression {(MULT|DIVIDE|MOD) unary_expression}
+	: unary_expression { (MULT|DIVIDE|MOD) unary_expression }
 
 
 51. additive_expression
-	: multiplicative_expression {(PLUS|MINUS) multiplicative_expression}
+	: multiplicative_expression { (PLUS|MINUS) multiplicative_expression }
 
 
 
 52. relational_expression
-	: additive_expression {(L_OP |G_OP |LE_OP |GE_OP)  additive_expression}
+	: additive_expression { (L_OP|G_OP|LE_OP|GE_OP)  additive_expression }
 
 
 53. equality_expression
-	: relational_expression {(EQ_OP |NE_OP) relational_expression}
+	: relational_expression { (EQ_OP|NE_OP) relational_expression }
 
 	
 54. logical_and_expression
-	: equality_expression {AND_OP equality_expression}
+	: equality_expression { AND_OP equality_expression }
 
 	
 55. logical_or_expression
-	: logical_and_expression {OR_OP logical_and_expression}
+	: logical_and_expression { OR_OP logical_and_expression }
 
 
 56. assignment_expression
-	: unary_expression EQ_OP assignment_expression
+	: unary_expression { EQ_OP assignment_expression }
 	
 
 57. expression
-	: assignment_expression {COMMA assignment_expression}
+	: assignment_expression { COMMA assignment_expression }
 
 	
 58. statement
@@ -305,11 +305,11 @@
 	
 
 62. statement_list
-	: statement {statement}
+	: statement { statement }
 	
 
 63. declaration_list
-	: declaration {declaration}
+	: declaration { declaration }
 	
 
 64. expression_statement

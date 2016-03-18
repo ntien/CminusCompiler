@@ -14,6 +14,7 @@ RHS1: {A}, RHS2: {B21, B22}, RHS3: {B21}
 RHS1: {C2, C3}, RHS2: {C2, C3} 
 
 
+#pairwise disjoint
 3. nonterminalb2
 	: B21 nonterminalc1
     | B22 nonterminalc2  

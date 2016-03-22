@@ -24,10 +24,15 @@
 
 
 6. external_next
-    : init_declarator_list SEMICOLON { declaration_specifiers SEMICOLON }
-    | direct_declarator function_definition
-	
-		
+    : direct_declarator external_next2
+
+7. external_next2
+    : external_init_declarator_list SEMICOLON { declaration_specifiers SEMICOLON }
+	| function_definition 
+
+8. external_init_declarator_list
+    : init_declarator { COMMA direct_declarator init_declarator }
+
 7. function_definition
 	: declaration_list compound_statement
 	| compound_statement
@@ -99,35 +104,35 @@
 	| EPSILON
 
 
-23. choose_declarator
-	: direct_declarator
-	| abstract_declarator
+23. abstract_or_direct_declarator
+    : OPEN_PAREN choose_declarator_next
+    | OPEN_BRACKET choose_declarator_next
+    | IDENTIFIER
+    | EPSILON
 
+24. abstract_direct_declarator_next
+    : direct_declarator_next1
+    | direct_declarator_next2
+    | direct_abstract_declarator_next1 { direct_abstract_declarator_next3 } 
+    | direct_abstract_declarator_next2 { direct_abstract_declarator_next3 }
+    
 24. identifier_list
 	: IDENTIFIER { COMMA IDENTIFIER }
-
 	
 25. initializer
 	: assignment_expression
 	| OPEN_BRACE ZERO CLOSE_BRACE 
 		
-
 26. type_name
 	: type_qualifier_specifier type_name_next
 
-	
 27. type_name_next
-	: pointer abstract_declarator
+	: pointer abstract_declarator 
 	| EPSILON
 
-28. abstract_declarator
-	: abstract_declarator_next
-	| direct_abstract_declarator	
-
-29. abstract_declarator_next
-	: direct_abstract_declarator
+28. abstract_declarator 
+	: direct_abstract_declarator	
 	| EPSILON
-
 
 30. direct_abstract_declarator
 	: OPEN_PAREN direct_abstract_declarator_next1 { direct_abstract_declarator_next3 }

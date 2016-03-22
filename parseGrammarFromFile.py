@@ -86,6 +86,7 @@ def build_terminals_dict_recurse(rules_dict, start, terminal_dict, visited):
   terminals = []
   visited[start] = 1
   for each_rule in rhs:
+    print rhs 
     first = each_rule[0]
     if is_terminal(first):
       terminals.append(first)

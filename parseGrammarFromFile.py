@@ -84,20 +84,23 @@ def build_terminals_dict(rules_dict, start, terminal_dict, visited):
 def build_terminals_dict_recurse(rules_dict, start, terminal_dict, visited):
   rhs = rules_dict[start]
   terminals = []
-  visited[start] = 1
-  for each_rule in rhs:
-    print rhs 
-    first = each_rule[0]
-    if is_terminal(first):
-      terminals.append(first)
-    else:
-      recurse = build_terminals_dict_recurse(rules_dict, first, terminal_dict, visited)
-      terminals = terminals + recurse[0]
-      terminal_dict = merge_dicts(terminal_dict, recurse[1])
-      visited = merge_dicts(visited, recurse[2])
-  if len(terminals) < 1:
-    print start 
-  terminal_dict[start] = terminals
+  if visited[start] != 1:
+    visited[start] = 1
+    for each_rule in rhs:
+      if len(each_rule) > 0:
+        first = each_rule[0]
+        if is_terminal(first):
+          terminals.append(first)
+        else:
+          recurse = build_terminals_dict_recurse(rules_dict, first, terminal_dict, visited)
+          terminals = terminals + recurse[0]
+          terminal_dict = merge_dicts(terminal_dict, recurse[1])
+          visited = merge_dicts(visited, recurse[2])
+    if len(terminals) < 1:
+      print start 
+    terminal_dict[start] = terminals
+  else:
+    terminals = terminal_dict[start]
   return terminals, terminal_dict, visited
 
 

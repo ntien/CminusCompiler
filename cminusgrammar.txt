@@ -15,7 +15,6 @@
 	: CONST
 	| STRING_LITERAL
 
-
 5. external_declaration
     : type_specifier external_next
     | choose_declarator function_definition
@@ -184,7 +183,7 @@
 
 42. primary_expression
 	: IDENTIFIER
-	| CONSTANT
+	| CONST
 	| STRING_LITERAL
 	| OPEN_PAREN expression CLOSE_PAREN
 	
@@ -277,8 +276,28 @@
 
 61. compound_statement_next
 	: CLOSE_BRACE
-	| statement_list CLOSE_BRACE
-	| declaration_list statement_list CLOSE_BRACE
+	| compound_statement { statement } CLOSE_BRACE
+	| selection_statement { statement } CLOSE_BRACE
+	| iteration_statement { statement } CLOSE_BRACE
+	| CONTINUE SEMICOLON { statement } CLOSE_BRACE
+	| BREAK SEMICOLON { statement } CLOSE_BRACE
+	| INC_OP unary_expression { EQ_OP assignment_expression } { COMMA assignment_expression } expression SEMICOLON {statement} CLOSE_BRACE
+	| DEC_OP unary_expression { EQ_OP assignment_expression } { COMMA assignment_expression } expression SEMICOLON {statement} CLOSE_BRACE
+	| IDENTIFIER { postfix_expression_next } { EQ_OP assignment_expression } { COMMA assignment_expression } expression SEMICOLON {statement} CLOSE_BRACE
+	| STRING_LITERAL { postfix_expression_next } { EQ_OP assignment_expression } { COMMA assignment_expression } expression SEMICOLON {statement} CLOSE_BRACE
+	| OPEN_PAREN expression CLOSE_PAREN { postfix_expression_next } { EQ_OP assignment_expression } { COMMA assignment_expression } expression SEMICOLON {statement} CLOSE_BRACE
+	| unary_operator unary_expression { EQ_OP assignment_expression } { COMMA assignment_expression } expression SEMICOLON {statement} CLOSE_BRACE
+	| SIZEOF unary_expression_sizeof { EQ_OP assignment_expression } { COMMA assignment_expression } expression SEMICOLON {statement} CLOSE_BRACE
+	| SEMICOLON {statement} CLOSE_BRACE
+    | CONST compound_statement_next1
+	| TYPEDEF type_specifier SEMICOLON {declaration_specifiers SEMICOLON } { declaration } statement_list CLOSE_BRACE
+	| type_specifier init_declarator_list SEMICOLON {declaration_specifiers SEMICOLON } { declaration } statement_list CLOSE_BRACE
+
+
+63. compound_statement_next1
+	| { postfix_expression_next } { EQ_OP assignment_expression } { COMMA assignment_expression } expression SEMICOLON {statement} CLOSE_BRACE
+    | type_specifier init_declarator_list SEMICOLON {declaration_specifiers SEMICOLON } { declaration } statement_list CLOSE_BRACE
+	
 
 62. statement_list
 	: statement { statement }

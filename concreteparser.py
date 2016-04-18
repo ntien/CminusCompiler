@@ -1,29 +1,39 @@
-class Acceptor(stringstream, mydict):
+import shlex 
+keywords = ["POUND", "DEFINE", "OPEN_PAREN", "CLOSE_PAREN", "OPEN_BRACE", "CLOSE_BRACE", "OPEN_BRACKET", "CLOSE_BRACKET", "POS", "NEG", "ADDRESS_OP", "POINTER", "INC_OP", "DEC_OP", "MULT", "DIVIDE", "MOD", "NOT", "SIZEOF", "IF", "WHILE", "RETURN", "CONTINUE", "BREAK", "SEMICOLON", "IDENTIFIER", "CONSTANT", "STRING_LITERAL"
+reserved = ["#", "DEFINE", "(", ")", "{", "}", "+", "-", "*", "TYPEDEF",   
+
+#Tree structure: [root, [child, child]]
+
+class ConcreteParseTree(stringstream, mydict):
   stream = shlex.shlex(stringstream) 
   terminaldict = mydict
   currenttoken = stream.get_token()
 
   def match_translation_unit(self):
-    match_compiler_or_external_declaration()
+    root = "translation_unit"
+    child = match_compiler_or_external_declaration()
     if currenttoken != "":
         match_translation_unit()
     else:
-        return True
+        return [root, [child]]
 
 
 
   def  match_compiler_or_external_declaration(self):
     if currenttoken == "#":
-        match_define_directive()
+        root = "#"
+        return [root, [match_define_directive()]]
     elif currenttoken in terminaldict["external_declaration"]:
-        match_external_declaration()
+        root = "external_declaration"
+        return [root, [match_external_declaration()]]
     else:
         return False 
     
   def match_define_directive(self):
     currenttoken = stream.get_token()
     if currenttoken == "DEFINE":
-      match_define_type()
+      root = "DEFINE"
+      return [root, [match_define_type()]
     else:
       return False 
     
@@ -33,9 +43,13 @@ class Acceptor(stringstream, mydict):
     #elif stream.get_token() == "STRING_LITERAL":
     currenttoken = stream.get_token()
     if currenttoken == "CONST":
+        leaf = "CONST"
         currenttoken = stream.get_token()
+        return [leaf]
     elif currenttoken == "STRING_LITERAL":
+        leaf = "STRING_LITERAL"
         currenttoken = stream.get_token()
+        return [leaf]
     else:
       return False   
 

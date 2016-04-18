@@ -106,6 +106,24 @@
 23. choose_declarator_next3
     : choose_declarator { direct_declarator_next }
 
+17. direct_declarator
+    : IDENTIFIER
+    | OPEN_PAREN direct_declarator_next1
+    | OPEN_BRACKET direct_declarator_next2
+
+
+18. direct_declarator_next1
+    : pointer direct_declarator CLOSE_PAREN
+    | parameter_list CLOSE_PAREN direct_declarator
+    | identifier_list CLOSE_PAREN direct_declarator
+    | CLOSE_PAREN direct_declarator
+
+
+19. direct_declarator_next2
+    : logical_or_expression CLOSE_BRACKET direct_declarator
+    | CLOSE_BRACKET direct_declarator
+
+
 24. identifier_list
 	: IDENTIFIER { COMMA IDENTIFIER }
 	

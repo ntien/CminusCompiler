@@ -45,11 +45,15 @@ def put_grammar_into_list():
 #this only checks rules that are called, eventually, by the first rule ("start")
 
 def check(rules_dict, rules, visited_dict):
+  multiple_rules = True
+  #rules is a list of all the rules (but not their righthandsides, and so should include NO terminals
+  #, so the multiple_rules = False case would look like: ["compound_statement", "if_statement", "VOID"]
   for i in xrange(len(rules)):
-     if is_terminal(rules[i]) == False:
-       return check_if_pairwise_disjoint(rules_dict, rules[i], visited_dict)
-     else:
-      return "only one rule, it seems"
+     if is_terminal(rules[i]) == True:
+       multiple_rules = False
+       return "Only one rule, it appears"
+  if multiple_rules == True:
+    return check_if_pairwise_disjoint(rules_dict, rules[0], visited_dict)
 
 
 
@@ -62,11 +66,11 @@ def check_if_pairwise_disjoint(rules_dict, start, visited):
    for key in terminal_dict:
      if len(set(terminal_dict[key])) < len(terminal_dict[key]):
        print key + " has " + str(terminal_dict[key]) + " terminals, which are not disjoint \n" 
-   
+       return False
    filename = raw_input("Where would you like to save the terminal dictionary to?")
    with open(filename, 'w') as f:
      json.dump(terminal_dict, f)
-   return False 
+   return True 
 
 
 def build_terminals_dict(rules_dict, start, terminal_dict, visited):
@@ -118,8 +122,13 @@ def is_terminal(token):
 
 if __name__=="__main__":
   l = put_grammar_into_list()
+  name = raw_input("Where would you like to save the dictionary of all the grammar rules?")
+  with open(name, 'w') as f:
+    json.dump(l[0], f)
   disjoint = check(l[0], l[1], l[2])
-    
+  if disjoint == False:
+    print "Problem..."
+ 
 
 
 

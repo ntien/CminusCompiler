@@ -1,9 +1,4 @@
-import shlex 
-keywords = ["POUND", "DEFINE", "OPEN_PAREN", "CLOSE_PAREN", "OPEN_BRACE", "CLOSE_BRACE", "OPEN_BRACKET", "CLOSE_BRACKET", "POS", "NEG", "ADDRESS_OP", "POINTER", "INC_OP", "DEC_OP", "MULT", "DIVIDE", "MOD", "NOT", "SIZEOF", "IF", "WHILE", "RETURN", "CONTINUE", "BREAK", "SEMICOLON", "IDENTIFIER", "CONSTANT", "STRING_LITERAL"
-reserved = ["#", "DEFINE", "(", ")", "{", "}", "+", "-", "*", "TYPEDEF",   
-
 #Tree structure: [root, [child, child]]
-
 class ConcreteParseTree(stringstream, mydict):
   stream = shlex.shlex(stringstream) 
   terminaldict = mydict
@@ -11,7 +6,7 @@ class ConcreteParseTree(stringstream, mydict):
 
   def match_translation_unit(self):
     root = "translation_unit"
-    child = match_compiler_or_external_declaration()
+    child = match_compiler_or_external_declaration():
     if currenttoken != "":
         match_translation_unit()
     else:
@@ -22,6 +17,7 @@ class ConcreteParseTree(stringstream, mydict):
   def  match_compiler_or_external_declaration(self):
     if currenttoken == "#":
         root = "#"
+        currenttoken = stream.get_token()
         return [root, [match_define_directive()]]
     elif currenttoken in terminaldict["external_declaration"]:
         root = "external_declaration"
@@ -30,7 +26,6 @@ class ConcreteParseTree(stringstream, mydict):
         return False 
     
   def match_define_directive(self):
-    currenttoken = stream.get_token()
     if currenttoken == "DEFINE":
       root = "DEFINE"
       return [root, [match_define_type()]
@@ -524,14 +519,16 @@ class ConcreteParseTree(stringstream, mydict):
 
   def match_compound_statement(self):
 
+from lexicalanalyzer import LexicalAnalyzer
 if __name__ == "__main__"
-  filename = raw_input("Where is your program stored?")
-  myfile = open(name, "r")
-  stream = myfile.read()
-  myfile.close()
+  f = raw_input("Where is your program?")
+  with open(f, 'r') as myfile:
+    mystring = myfile.read()
+  x = LexicalAnalyzer(mystring)
+  tokens = x.tokenize() 
   dictname = raw_input("Where is the terminal dictionary stored?")
-  myfile = open(dictname, "r")
-  mydict = myfile.read()
-  myfile.close()
-  acceptor = Acceptor(stream, mydict)
+  terminaldict = {}
+  with open(dictname, 'r'):
+    terminaldict = eval(dictname.read())
+  ParseTree = ConcreteParseTree(stream, mydict)
   acceptor.match_translation_unit()

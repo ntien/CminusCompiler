@@ -5,15 +5,71 @@ class LexicalAnalyzer():
   def __init__(self, string):
     self.raw = string
     #list of all accepted tokens
-    self.reserved = {";":"SEMICOLON","(":"OPEN_PAREN",")":"CLOSE_PAREN","[":"OPEN_BRACKET","]":"CLOSE_BRACKET","{":"OPEN_BRACE","}":"CLOSE_BRACE", "#":"POUND","*":"STAR|MULT|POINTER", "&":"ADDRESS_OP", "=":"ASSIGN_OP","==":"EQ_OP", "<=":"LE_OP", ">=":"GE_OP", "<":"L_OP",">":"G_OP","!":"NOT", "!=":"NE_OP", "define":"DEFINE", "const":"CONST", "string":"STRING_LITERAL", "int":"INT", "typedef":"TYPEDEF", "void":"VOID", "char":"CHAR", "typename":"TYPE_NAME", "if":"IF", "while":"WHILE", "for":"FOR", "else":"ELSE", "continue":"CONTINUE", "break":"BREAK", "return":"RETURN", "+":"PLUS", "-":"MINUS", "/":"DIVIDE", "%":"MOD", ".":"PERIOD", "++":"INC_OP","--":"DEC_OP"}
+    self.reserved = {";":"SEMICOLON",
+                        "(":"OPEN_PAREN",
+                        ")":"CLOSE_PAREN",
+                        "[":"OPEN_BRACKET",
+                        "]":"CLOSE_BRACKET",
+                        "{":"OPEN_BRACE",
+                        "}":"CLOSE_BRACE",
+                        "#":"POUND",
+                        "*":"STAR|MULT|POINTER",
+                        "&":"ADDRESS_OP",
+                        "=":"ASSIGN_OP",
+                        "==":"EQ_OP",
+                        "<=":"LE_OP",
+                        ">=":"GE_OP",
+                        "<":"L_OP",
+                        ">":"G_OP",
+                        "!":"NOT",
+                        "!=":"NE_OP",
+                        "define":"DEFINE",
+                        "const":"CONST",
+                        "string":"STRING_LITERAL",
+                        "int":"INT",
+                        "typedef":"TYPEDEF",
+                        "void":"VOID",
+                        "char":"CHAR",
+                        "typename":"TYPE_NAME",
+                        "if":"IF",
+                        "while":"WHILE",
+                        "for":"FOR",
+                        "else":"ELSE",
+                        "continue":"CONTINUE",
+                        "break":"BREAK",
+                        "return":"RETURN",
+                        "+":"PLUS",
+                        "-":"MINUS",
+                        "/":"DIVIDE",
+                        "%":"MOD",
+                        ".":"PERIOD",
+                        "++":"INC_OP",
+                        "--":"DEC_OP",
+                        "": "EPSILON",
+                        "tempsizeof": "SIZEOF",
+                        "tempid":"IDENTIFIER",
+                        "1":"ZERO",
+                        ",":"COMMA",
+                        "*":"POINTER",
+                        "+|-":"PLUSMINUS",
+                        "<|>|<=|>=": "L_OPG_OPLE_OPGE_OP",
+                        "+":"POS",
+                        "-":"NEG",
+                        "*|/|%":"MULTDIVIDEMOD",
+                        "tempnum":"NUM_CONST",
+                        "**":"PTR_OP",
+                        "*":"POINTER",
+                        "=|!=":"EQ_OPNE_OP",
+                        "&&":"AND_OP",
+                        "||":"OR_OP",
+                        "struct":"STRUCT",
+                        "enum":"ENUM"}
     self.literaltable = {}
     self.symboltable = {} 
     self.tokens = []
 
     self.define = False
     self.defineName = ""
-    self.ident = 0 #only for identifiers being initialized here, not parameters or undefined;
-    self.identName = ""
     #pattern match
     #creat symbol table
 
@@ -67,8 +123,6 @@ class LexicalAnalyzer():
   def is_valid_token(self, string):
         if len(string) != "":
           if string in self.reserved:
-            if string == "=" and self.ident == 1:
-              self.ident = 2
             return True 
           elif self.is_number(string):
             return True
@@ -91,23 +145,16 @@ class LexicalAnalyzer():
               if self.define == True and len(self.defineName) > 0:
                 self.set_defined_var(string, "NUM_CONST")
               #if an identifier came right before this, then this could be its number value
-              elif self.ident == 2 and len(self.identName) > 0:
-                self.set_identifier(string, "NUM_CONST")
               return (id_num, "NUM_CONST", string)
 
           elif self.is_id(string):
             if self.define == True:
               self.defineName = string 
-            else:
-              self.ident = 1
-              self.identName = string 
             return (id_num, "IDENTIFIER", string)
 
           elif self.is_string_literal(string):
             if self.define == True and len(self.defineName) > 0:
               self.set_defined_var(string, "STRING_LITERAL") 
-            elif self.ident == 2 and len(self.identName) > 0:
-                self.set_identifier(string, "STRING_LITERAL")
             return (id_num, "STRING_LITERAL", string)
           else:
             print "Error! \n"
@@ -148,11 +195,6 @@ class LexicalAnalyzer():
       literaltable[self.defineName] = (string, vartype)
       self.define = False
       self.defineName = ""
-
-  def set_identifier(self, string, vartype):
-      self.symboltable[self.identName] = (string, vartype)
-      self.ident = False
-      self.identName = ""
 
 if __name__=="__main__":
     f = raw_input("Where is your program?")

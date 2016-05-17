@@ -2,134 +2,198 @@ import re
 import json
 #writing functions to write functions....trop meta! 
 
+'''
+Example1: (a grammar rule with a single rule in its RHS) 
+
+rule:
+define_directive
+	: POUND DEFINE IDENTIFIER define_type 
+
+function that should match this rule:
 def match_define_directive(self):
-    currenttoken = stream.get_token()
-    if currenttoken == "DEFINE":
-      root = "DEFINE"
-      return [root, [match_define_type()]
-    else:
-      return False 
-   
-def make_concrete_tree_methods(rulesdict):
+    root = "define_directive"
+    children = []
+    children.append(match_pound()).append(match_define()).append(match_id()).append(match_define_type())
+    return [root, children] 
+'''
+
+'''
+think about terminals and nonterminals, when to update current token
+Example2: (a grammar rule with multiple rules in its RHS)
+
+rule:
+4. define_type
+	: NUM_CONST
+	| STRING_LITERAL
+
+function:
+def match_define_type(self):
+    root = "define_type"
+    chidlren = []
+    if currenttoken == "NUM_CONST":
+        children.append(match_num_const())
+    elif currenttoken == "STR_LIT":
+        children.append(match_str_lit())
+    return [root, children]
+
+
+rule:
+8. function_definition
+	: declaration_list compound_statement
+	| compound_statement
+
+function:
+
+def match_function_definition(self):
+    root = "function_definition"
+    children = []
+    if currenttoken in terminaldict["declaration_list"]:
+        children.append(match_declaration_list()).append(match_compound_statement())
+    elif currenttoken in terminaldict["compound_statement"]
+        children.append(match_compound_statement())
+    return [root, children] 
+'''
+
+def make_concrete_tree_methods(reservedwords_dict, rulesdict):
 #This function takes a dictoinary of rules for a grammar, the key being the name of the rule and the value being the right-hand side of the rule, and writes all the rules for generating the Concrete Parse Trees for this grammar (since they follow the same procedure).
   methods = [] 
   '''self argument included because Concrete Parse Tree implemented as class
      also trying to deal with the necessary whitespace in creating these python functions
      how to deal with 0 or more repitions? rule { rule } ???'''
   for key in rulesdict:
-    declaration = "  def match_" + key + "(self):"
-    rhs = rules_dict[key]
+    thismethod = []
+    rhs = rulesdict[key]
+    whitespace = "  " 
+    declaration = whitespace + "def match_" + key + "(self): \n"
+    root = whitespace + whitespace + "root = \"" + key + "\" \n" 
+    line1 = whitespace + whitespace + "children = [] \n"
+    returnline = whitespace + whitespace + "return [root, children] \n"
     if len(rhs) > 1:
-        #multiple if statements 
-    else:
-      line1 = " 
-        if len(rule) > 0 and len(name) > 0:
-          name = name.strip()
-          rules.append(name)
-          rules_dict[name] = rule
-          visited_dict[name] = 0
-        name = re.split('[0-9]+\.', line)[1]
-        rule = []
-      else:
-        if line!="" and line!=" ":
-          temptemp = line.split(" ")
-          temp = []
-          for item in temptemp:
-            item = item.replace("{","").replace("}","").replace("(","").replace(")","").strip()
-            if item !="" and item !=" ":
-              temp.append(item)
-          if temp !="" and temp != " ":
-            rule.append(temp)
-    if len(rule) > 0 and len(name) > 0:
-      name = name.strip()
-      rules.append(name)
-      rules_dict[name] = rule
-      visited_dict[name] = 0
-  return rules_dict, rules, visited_dict
-
-#this only checks rules that are called, eventually, by the first rule ("start")
-
-def check(rules_dict, rules, visited_dict):
-  multiple_rules = True
-  for i in xrange(len(rules)):
-     if is_terminal(rules[i]) == True:
-       multiple_rules = False
-       return "Only one rule, it appears"
-  if not multiple_rules:
-    return check_if_pairwise_disjoint(rules_dict, rules[0], visited_dict)
-
-
-
-def check_if_pairwise_disjoint(rules_dict, start, visited):
-#This function takes the dictionary of rules and checks that the first terminal of each rule's right-hand-side-rules are different (pairwise disjoint)''' 
-#first: build set of all first tokens of each rule and put into dictionary
-#then: check that the right-hand-sides of each rule has disjoint sets
-   terminals = build_terminals_dict(rules_dict, start, {}, visited)
-   terminal_dict = terminals[0]
-   for key in terminal_dict:
-     if len(set(terminal_dict[key])) < len(terminal_dict[key]):
-       print key + " has " + str(terminal_dict[key]) + " terminals, which are not disjoint \n" 
-   
-   filename = raw_input("Where would you like to save the terminal dictionary to?")
-   with open(filename, 'w') as f:
-     json.dump(terminal_dict, f)
-   return False 
-
-
-def build_terminals_dict(rules_dict, start, terminal_dict, visited):
-  thislevel = build_terminals_dict_recurse(rules_dict, start, terminal_dict, visited)
-  terminal_dict = thislevel[1]
-  visited = thislevel[2]
-  count = 0
-  for key in visited:
-      count += 1
-      if visited[key] == 0:
-        return build_terminals_dict(rules_dict, key, terminal_dict, visited)
-  if count == len(visited):
-    return terminal_dict, visited
-
-def build_terminals_dict_recurse(rules_dict, start, terminal_dict, visited):
-  rhs = rules_dict[start]
-  terminals = []
-  if visited[start] != 1:
-    visited[start] = 1
-    for each_rule in rhs:
-      if len(each_rule) > 0:
-        first = each_rule[0]
-        if is_terminal(first):
-          terminals.append(first)
+      #multiple rules (and thus, multiple if statements) --> rhs = [[rule1],[rule2],[rule3]]
+      lines = []
+      for line  in rhs:
+        condition = line[0]
+        if is_terminal(condition):
+          lines.append(whitespace + whitespace + "if currenttoken == \"" + condition +"\": \n")
+          for rule in line:
+              childrenline = whitespace + whitespace + whitespace + "children"
+              if is_terminal(rule):
+                terminalname = rule.lower()
+                childrenline = childrenline + ".append(self.match_" + terminalname + "())" #TODO 
+              else:
+                childrenline = childrenline + ".append(self.match_" + rule  + "())" #TODO 
+          lines.append(childrenline)
+          lines.append("\n")
         else:
-          recurse = build_terminals_dict_recurse(rules_dict, first, terminal_dict, visited)
-          terminals = terminals + recurse[0]
-          terminal_dict = merge_dicts(terminal_dict, recurse[1])
-          visited = merge_dicts(visited, recurse[2])
-    if len(terminals) < 1:
-      print start 
-    terminal_dict[start] = terminals
-  else:
-    terminals = terminal_dict[start]
-  return terminals, terminal_dict, visited
-
-
-def merge_dicts(merge_to, merge_from):
-  for key in merge_from:
-    merge_to[key] = merge_from[key]
-  return merge_to
-
+          lines.append(whitespace + whitespace + "if currenttoken in terminaldict[\"" + line[0] + "\"]: \n")
+          for rule in line:
+              childrenline = whitespace + whitespace + whitespace + "children"
+              if is_terminal(rule):
+                terminalname = rule.lower()
+                childrenline = childrenline + ".append(self.match_" + terminalname + "())" #TODO 
+              else:
+                childrenline = childrenline + ".append(self.match_" + rule  + "())" #TODO 
+          childrenline = childrenline + "\n"
+          lines.append(childrenline)
+      thismethod.append(declaration)
+      thismethod.append(root)
+      thismethod.append(line1)
+      thismethod.append(lines)
+      thismethod.append(returnline)  
+      thismethod.append("\n")
+      methods.append(thismethod)
+    else:
+        #rhs = [[rule1]], e.g. rule1 = ["this", "that", "the", "other"] 
+      rhs = rhs[0]
+      childrenline = whitespace + whitespace + "children"
+      #children.append(...all the match rules 
+      for rule in rhs:
+        if is_terminal(rule):
+          terminalname = rule.lower()
+          childrenline = childrenline + ".append(self.match_" + terminalname + "())" #TODO 
+          #add the the currenttoken/rule to the (check that it matches?) and update
+        else:
+          childrenline = childrenline + ".append(self.match_" + rule + "())"
+      childrenline = childrenline + "\n"
+      thismethod.append(declaration)
+      thismethod.append(root)
+      thismethod.append(line1)
+      thismethod.append(childrenline)
+      thismethod.append(returnline)  
+      thismethod.append("\n")
+      methods.append(thismethod)
+  return methods  
+      
 def is_terminal(token):
     if re.search('[A-Z]', token) is not None:
       return True
     else:
       return False
 
+def write_methods_for_reservedwords(reserved):
+  methods = []
+  for key in reserved:
+    thismethod = []
+    name = key.lower()
+    thismethod = []
+    whitespace = "  " 
+    declaration = whitespace + "def match_" + name + "(self): \n"
+    leaf = whitespace + whitespace + "leaf = [] \n"
+    ifstatement = whitespace + whitespace + "if currenttoken == \"" + key +"\": \n"
+    elsestatement = whitespace + whitespace + "else: \n"
+    ifbody = whitespace + whitespace + whitespace + "currenttoken = self.get_token() \n"
+    returntrue = whitespace + whitespace + whitespace + "return [\"" + key + "\"] \n"
+    returnfalse = whitespace + whitespace + whitespace + "print \" Error! Unexpected token\" + currenttoken \n" + whitespace + whitespace + whitespace + "return False \n \n"
+    thismethod.append(declaration)
+    thismethod.append(leaf)
+    thismethod.append(ifstatement)
+    thismethod.append(ifbody)
+    thismethod.append(returntrue)
+    thismethod.append(elsestatement)
+    thismethod.append(returnfalse)
+    methods.append(thismethod)
+  return methods 
+   
+def write_list_of_methods_to_file(methodslist, reservedmethods): 
+    f = raw_input("Where do you want to write this file?")
+    with open(f, 'w') as myfile:
+        openingstring = "#Tree structure: [root, [child, child]] \nclass ConcreteParseTree(stringstream, mydict):\n  terminaldict = mydict\n  currenttoken = self.get_token() \n \n" 
+        myfile.write(openingstring)
+        for item in reservedmethods:
+            if isinstance(item, list): 
+              for rule in item:
+                myfile.write(rule)
+        for item in methods:
+          if isinstance(item, list):
+            for rule in item:
+              if isinstance(rule, list):
+                for thing in rule:
+                  myfile.write(thing)
+              else:
+                myfile.write(rule)
+          else:
+            myfile.write(item)
+        closingstring = "\n \nfrom lexicalanalyzer import LexicalAnalyzer\nif __name__ == \"__main__\":\n  f = raw_input(\"Where is your program?\")\n  with open(f, 'r') as myfile:\n    mystring = myfile.read()\n  x = LexicalAnalyzer(mystring)\n  tokens = x.tokenize()\n  dictname = raw_input(\"Where is the terminal dictionary stored?\")\n  terminaldict = {}\n  with open(dictname, 'r'):\n    terminaldict = eval(dictname.read())\n  ParseTree = ConcreteParseTree(tokens, terminaldict)\n  ParseTree.match_translation_unit()\n  return \"done\""
+        myfile.write(closingstring)
+        return "done"        
 
+from lexicalanalyzer import LexicalAnalyzer
 if __name__=="__main__":
-  f = raw_input("Where is your rules_dict stored?")
+  mystring = "empty string"
+  x = LexicalAnalyzer(mystring)
+  reserved = {}
+  temp = x.reserved
+  for key in temp:
+    reserved[temp[key]] = key 
+  
+  #f = raw_input("Where is your rules dict stored?")
+  f = "rulesdict.txt"
   with open(f, 'r') as myfile:
     mystring = myfile.read()
   rulesdict = eval(mystring) 
-  make_concrete_tree_methods(rulesdict)
-    
+  methods = make_concrete_tree_methods(reserved, rulesdict)
+  reservedmethods = write_methods_for_reservedwords(reserved)
+  write_list_of_methods_to_file(methods, reservedmethods) 
 
 
 

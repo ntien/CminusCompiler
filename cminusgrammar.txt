@@ -69,7 +69,7 @@
 
 
 15. init_declarator
-	: EQ_OP initializer
+	: ASSIGN_OP initializer
 	| EPSILON
 
 16. parameter_list
@@ -274,7 +274,7 @@
 
 
 57. assignment_expression
-	: unary_expression { EQ_OP assignment_expression }
+	: unary_expression { ASSIGN_OP assignment_expression }
 	
 
 58. expression

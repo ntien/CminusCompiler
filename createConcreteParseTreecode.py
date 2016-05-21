@@ -72,11 +72,10 @@ def make_concrete_tree_methods(reservedwords_dict, rulesdict):
       #multiple rules (and thus, multiple if statements) --> rhs = [[rule1],[rule2],[rule3]]
       lines = []
       for line  in rhs:
-        condition = line[0]
-        if is_terminal(condition):
-          lines.append(whitespace + whitespace + "if currenttoken == \"" + condition +"\": \n")
+        if is_terminal(line[0]):
+          lines.append(whitespace + whitespace + "elif currenttoken == \"" + line[0]  +"\": \n")
+          childrenline = whitespace + whitespace + whitespace + "children"
           for rule in line:
-              childrenline = whitespace + whitespace + whitespace + "children"
               if is_terminal(rule):
                 terminalname = rule.lower()
                 childrenline = childrenline + ".append(self.match_" + terminalname + "())" #TODO 
@@ -85,9 +84,9 @@ def make_concrete_tree_methods(reservedwords_dict, rulesdict):
           lines.append(childrenline)
           lines.append("\n")
         else:
-          lines.append(whitespace + whitespace + "if currenttoken in terminaldict[\"" + line[0] + "\"]: \n")
+          lines.append(whitespace + whitespace + "elif currenttoken in terminaldict[\"" + line[0] + "\"]: \n")
+          childrenline = whitespace + whitespace + whitespace + "children"
           for rule in line:
-              childrenline = whitespace + whitespace + whitespace + "children"
               if is_terminal(rule):
                 terminalname = rule.lower()
                 childrenline = childrenline + ".append(self.match_" + terminalname + "())" #TODO 

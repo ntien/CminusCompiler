@@ -64,8 +64,7 @@ class LexicalAnalyzer():
                         "||":"OR_OP",
                         "struct":"STRUCT",
                         "enum":"ENUM"}
-    self.literaltable = {}
-    self.symboltable = {} 
+    self.literaltable = {} #only used for # DEFINE variables
     self.tokens = []
 
     self.define = False

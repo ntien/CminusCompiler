@@ -2,22 +2,23 @@
 class ConcreteParseTree():
 
   def __init__(self, tokens, mydict):
-      self.symboltabe = {} 
+      self.symboltable = {} 
       self.terminaldict = mydict
       self.stream = tokens 
       #structure of tokens:
       #[(id_num, "ID", string),(id_num, "STR_LIT", string),(id_num, reserved_word, string)]
       self.currenttoken = self.stream[0] #need to start here
-      self.index = 1 #since self.currenttoken[1] has already been initalized at self.stream[0]
+      self.index = 0 #since self.currenttoken[1] has already been initalized at self.stream[0]
       self.assign = False
       self.declare = False
+      self.function = False
       self.id_to_define = ''
       self.id_type = ''
       self.constant = False
       self.tree = []
 
   def get_token(self):
-    if self.currenttoken >= len(self.stream):
+    if self.index >= len(self.stream):
       self.currenttoken = ("00","EOF","EOF")
       print "EOF"
     else:
@@ -32,6 +33,7 @@ class ConcreteParseTree():
     self.id_value = ''
     self.assign = False
     self.declare = False
+    self.function = False
     self.constant = False
 
   def match_close_bracket(self): 
@@ -355,12 +357,21 @@ class ConcreteParseTree():
       self.get_token() 
       return ["CLOSE_BRACE"] 
     else: 
+      #print self.currenttoken[0]
+      #print self.currenttoken[2]
       print " Error! Expected token CLOSE_BRACE, got " + self.currenttoken[1] 
       return False 
  
   def match_identifier(self): 
     if self.currenttoken[1] == "IDENTIFIER": 
       old = self.currenttoken[2]
+      if self.assign == True or self.declare == True:
+        self.id_to_define = old        
+      if self.function == False:
+          if old not in self.symboltable:
+            print " Error! Variable \"" + old + "\" referenced before assignment" 
+      if self.function == True:
+        self.function = False
       self.get_token() 
       return ["IDENTIFIER:" + old] 
     else: 
@@ -377,6 +388,16 @@ class ConcreteParseTree():
  
   def match_string_literal(self): 
     if self.currenttoken[1] == "STRING_LITERAL": 
+
+      if self.declare == True and len(self.id_to_define) >0 and len(self.id_type) > 0:
+        self.symboltable[self.id_to_define] = (self.id_type, self.currenttoken[2])
+        self.reset_id()
+
+      elif self.assign == True and len(self.id_to_define) > 0 and self.id_type == "":
+        mytype = self.symboltable[self.id_to_define][2]
+        self.symboltable[self.id_to_define] = (mytype, self.currenttoken[2])
+        self.reset_id()
+
       self.get_token() 
       return ["STRING_LITERAL"] 
     else: 
@@ -436,11 +457,22 @@ class ConcreteParseTree():
  
   def match_num_const(self): 
     if self.currenttoken[1] == "NUM_CONST": 
+
+      if self.declare == True and len(self.id_to_define) >0 and len(self.id_type) > 0:
+        self.symboltable[self.id_to_define] = (self.id_type, self.currenttoken[2])
+        self.reset_id()
+
+      elif self.assign == True and len(self.id_to_define) > 0 and self.id_type == "":
+        mytype = self.symboltable[self.id_to_define][2]
+        self.symboltable[self.id_to_define] = (mytype, self.currenttoken[2])
+        self.reset_id()
+
+
       self.get_token() 
       return ["NUM_CONST"] 
     else: 
       print " Error! Expected token NUM_CONST, got " + self.currenttoken[1] 
-      return False 
+      return False
  
   def match_l_op(self): 
     if self.currenttoken[1] == "L_OP": 
@@ -649,12 +681,16 @@ class ConcreteParseTree():
   def match_external_declaration(self): 
     root = "external_declaration" 
     children = [] 
+
     if self.currenttoken[1] in terminaldict["type_specifier"]: 
+      self.declare = True
       children.append(self.match_type_specifier())
       children.append(self.match_external_next())
+
     elif self.currenttoken[1] in terminaldict["choose_declarator"]: 
       children.append(self.match_choose_declarator())
       children.append(self.match_function_definition())
+
     elif self.currenttoken[1] in terminaldict["type_qualifier"]: 
       children.append(self.match_type_qualifier()).append(self.match_type_specifier()).append(self.match_init_declarator_list())
       children.append(self.match_semicolon())
@@ -669,6 +705,8 @@ class ConcreteParseTree():
   def match_type_specifier(self): 
     root = "type_specifier" 
     children = [] 
+    if self.declare == True:
+        self.id_type = self.currenttoken[1]
     if self.currenttoken[1] == "VOID": 
       children.append(self.match_void())
     elif self.currenttoken[1] == "CHAR": 
@@ -721,6 +759,7 @@ class ConcreteParseTree():
     root = "choose_declarator" 
     children = [] 
     if self.currenttoken[1] == "IDENTIFIER": 
+      self.function = True
       children.append(self.match_identifier())
     elif self.currenttoken[1] in terminaldict["choose_declarator_next"]: 
       children.append(self.match_choose_declarator_next())
@@ -894,7 +933,12 @@ class ConcreteParseTree():
   def match_selection_statement(self): 
     root = "selection_statement" 
     children = [] 
-    children.append(self.match_if()).append(self.match_open_paren()).append(self.match_expression()).append(self.match_close_paren()).append(self.match_statement()).append(self.match_selection_statement_next())
+    children.append(self.match_if())
+    children.append(self.match_open_paren())
+    children.append(self.match_expression())
+    children.append(self.match_close_paren())
+    children.append(self.match_statement())
+    children.append(self.match_selection_statement_next())
     return [root, children] 
 
   def match_postfix_expression_next(self): 
@@ -947,12 +991,13 @@ class ConcreteParseTree():
       children.append(self.match_typedef()).append(self.match_type_specifier())
     return [root, children] 
 
+  #AQUI
   def match_declaration(self): 
-    self.declaration = True
+    self.declare = True
     root = "declaration" 
     children = [] 
     children.append(self.match_declaration_specifiers())
-    #TODO ???
+    #TODO here?
     children.append(self.match_semicolon())
     children = children + self.match_possible_declaration_specifiers_semicolon()
     return [root, children] 
@@ -1061,6 +1106,8 @@ class ConcreteParseTree():
     elif self.currenttoken[1] in terminaldict["declaration_list"]: 
       children.append(self.match_declaration_list())
       children.append(self.match_compound_statement_next1())
+    else:
+      print "ERROR: token " + self.currenttoken[1] + ", id: " + str(self.currenttoken[0])
     return [root, children] 
 
   def match_compound_statement_next1(self): 
@@ -1071,6 +1118,8 @@ class ConcreteParseTree():
     elif self.currenttoken[1] in terminaldict["statement_list"]: 
       children.append(self.match_statement_list())
       children.append(self.match_close_brace())
+    else:
+      print "ERROR: token " + self.currenttoken[1]
     return [root, children] 
 
   def match_struct_specifier(self): 
@@ -1086,6 +1135,8 @@ class ConcreteParseTree():
       children.append(self.match_close_paren())
     elif self.currenttoken[1] in terminaldict["parameter_list"]: 
       children.append(self.match_parameter_list()).append(self.match_close_paren())
+    else:
+      print "ERROR: token " + self.currenttoken[1]
     return [root, children] 
 
   def match_direct_declarator_next2(self): 
@@ -1095,13 +1146,16 @@ class ConcreteParseTree():
       children.append(self.match_logical_or_expression()).append(self.match_close_bracket()).append(self.match_direct_declarator())
     elif self.currenttoken[1] == "CLOSE_BRACKET": 
       children.append(self.match_close_bracket()).append(self.match_direct_declarator())
+    else:
+      print "ERROR: token " + self.currenttoken[1]
     return [root, children] 
 
   def match_declaration_list(self): 
     root = "declaration_list" 
     children = [] 
     children.append(self.match_declaration())
-    children = children + self.match_possible_declaration()
+    #TODO:  
+    #children = children + self.match_possible_declaration()
     return [root, children] 
 
   def match_selection_statement_next(self): 
@@ -1111,6 +1165,8 @@ class ConcreteParseTree():
       children.append(self.match_else()).append(self.match_statement())
     elif self.currenttoken[1] == "EPSILON": 
       children.append(self.match_epsilon())
+    else:
+      print "ERROR: token " + self.currenttoken[1]
     return [root, children] 
 
   def match_enum_specifier(self): 
@@ -1295,7 +1351,8 @@ class ConcreteParseTree():
 	#relational_expression { (EQ_OP|NE_OP) relational_expression }
     children = []
     if self.currenttoken[1] == "EQ_OP" or self.currenttoken[1] == "NE_OP":
-      children.append(self.match_eq_opne_op()).append(self.match_relational_expression())
+      children.append(self.match_eq_opne_op())
+      children.append(self.match_relational_expression())
       children = children + self.match_possible_eq_opne_op_relational_expression()
       return children
     else:
@@ -1367,7 +1424,7 @@ class ConcreteParseTree():
 from lexicalanalyzer import LexicalAnalyzer
 if __name__ == "__main__":
   #f = raw_input("Where is your program?")
-  f = "fail1.cc"
+  f = "fail3.cc"
   with open(f, 'r') as myfile:
     mystring = myfile.read()
   x = LexicalAnalyzer(mystring)

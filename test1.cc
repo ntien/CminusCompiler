@@ -7,6 +7,6 @@ int main() {
     result = result*x;
     x = x-1;
   } 
-    return result;
+  return result;
 }
 

@@ -274,7 +274,7 @@
 
 
 57. assignment_expression
-	: unary_expression { ASSIGN_OP assignment_expression }
+	: logical_or_expression { ASSIGN_OP logical_or_expression }
 	
 
 58. expression
@@ -297,31 +297,40 @@
     | statement_list CLOSE_BRACE
     | declaration_list compound_statement_next1
 
-62. statement_list
+62. compound_statement_next1
+    : CLOSE_BRACE
+    | statement_list CLOSE_BRACE
+
+63. statement_list
 	: statement { statement }
 	
 
-63. declaration_list
+64. declaration_list
 	: declaration { declaration }
 
-64. jump_statement
+65. jump_statement
 	: CONTINUE SEMICOLON
 	| BREAK SEMICOLON
-	| expression_statement
+	| RETURN jump_return
 
-65. selection_statement
+66. jump_return
+    : SEMICOLON
+    | expression SEMICOLON
+    
+
+67. selection_statement
 	: IF OPEN_PAREN expression CLOSE_PAREN statement selection_statement_next
 
-66. expression_statement
+68. expression_statement
     : SEMICOLON
     | expression SEMICOLON
 
-67. selection_statement_next
+69. selection_statement_next
 	: ELSE statement
 	| EPSILON		
 
 
-68. iteration_statement
+70. iteration_statement
 	: WHILE OPEN_PAREN expression CLOSE_PAREN statement
 
 

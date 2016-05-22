@@ -73,7 +73,7 @@ def make_concrete_tree_methods(reservedwords_dict, rulesdict):
       lines = []
       for line  in rhs:
         if is_terminal(line[0]):
-          lines.append(whitespace + whitespace + "elif currenttoken == \"" + line[0]  +"\": \n")
+          lines.append(whitespace + whitespace + "elif self.currenttoken[1] == \"" + line[0]  +"\": \n")
           childrenline = whitespace + whitespace + whitespace + "children"
           for rule in line:
               if is_terminal(rule):
@@ -84,7 +84,7 @@ def make_concrete_tree_methods(reservedwords_dict, rulesdict):
           lines.append(childrenline)
           lines.append("\n")
         else:
-          lines.append(whitespace + whitespace + "elif currenttoken in terminaldict[\"" + line[0] + "\"]: \n")
+          lines.append(whitespace + whitespace + "elif self.currenttoken[1] in terminaldict[\"" + line[0] + "\"]: \n")
           childrenline = whitespace + whitespace + whitespace + "children"
           for rule in line:
               if is_terminal(rule):
@@ -137,14 +137,12 @@ def write_methods_for_reservedwords(reserved):
     thismethod = []
     whitespace = "  " 
     declaration = whitespace + "def match_" + name + "(self): \n"
-    leaf = whitespace + whitespace + "leaf = [] \n"
-    ifstatement = whitespace + whitespace + "if currenttoken == \"" + key +"\": \n"
+    ifstatement = whitespace + whitespace + "if self.currenttoken[1] == \"" + key +"\": \n"
     elsestatement = whitespace + whitespace + "else: \n"
-    ifbody = whitespace + whitespace + whitespace + "currenttoken = self.get_token() \n"
+    ifbody = whitespace + whitespace + whitespace + "self.get_token() \n"
     returntrue = whitespace + whitespace + whitespace + "return [\"" + key + "\"] \n"
-    returnfalse = whitespace + whitespace + whitespace + "print \" Error! Unexpected token\" + currenttoken \n" + whitespace + whitespace + whitespace + "return False \n \n"
+    returnfalse = whitespace + whitespace + whitespace + "print \" Error! Expected token " + key + ", got \" + self.currenttoken[1] \n" + whitespace + whitespace + whitespace + "return False \n \n"
     thismethod.append(declaration)
-    thismethod.append(leaf)
     thismethod.append(ifstatement)
     thismethod.append(ifbody)
     thismethod.append(returntrue)
@@ -156,7 +154,7 @@ def write_methods_for_reservedwords(reserved):
 def write_list_of_methods_to_file(methodslist, reservedmethods): 
     f = raw_input("Where do you want to write this file?")
     with open(f, 'w') as myfile:
-        openingstring = "#Tree structure: [root, [child, child]] \nclass ConcreteParseTree(stringstream, mydict):\n  terminaldict = mydict\n  currenttoken = self.get_token() \n \n" 
+        openingstring = "#Tree structure: [root, [child, child]] \nclass ConcreteParseTree(stringstream, mydict):\n  terminaldict = mydict\n  self.currenttoken = self.get_token() \n \n" 
         myfile.write(openingstring)
         for item in reservedmethods:
             if isinstance(item, list): 

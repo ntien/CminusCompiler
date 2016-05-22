@@ -1,0 +1,15 @@
+['function_definition', 
+    [['declaration', 
+        [['INT'], ['IDENTIFIER:x'], ['ASSIGN_OP'], ['NUM_CONST']]],
+    [['external_declaration', [['INT'], ['IDENTIFIER:result'], ['ASSIGN_OP'], ['NUM_CONST']]],
+    [['WHILE', 
+        [
+            [['IDENTIFIER: x'], [G_OP], ['1']], 
+            ['statement_list', 
+                ['MULT', [['IDENTIFIER:result'],["IDENTIFIER:x']]], 
+                ['ASSIGN_OP', ['IDENTIFIER:x'], 
+                    ['MINUS', [[IDENTIFIER:x'],['NUM_CONST']]]]]]
+
+    [['RETURN', ['IDENTIFIER:result']]]]]]]]
+
+

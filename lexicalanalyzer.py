@@ -86,7 +86,7 @@ class LexicalAnalyzer():
       match = False
       unique_id = 0
       i = 0 
-      while i < len(mystring)-1:
+      while i < len(mystring):
         letter = mystring[i]
         new = word + letter
         #new should either be a reserved word, a numeric constant, a string literal, or an identifier
@@ -98,7 +98,7 @@ class LexicalAnalyzer():
           if letter == " ":
             if match == True:
               #TODO: add token to list 
-              if word == "DEFINE":
+              if word == "define":
                 self.define = True
               if word in self.literaltable:
                 word = self.literaltable[word]
@@ -109,12 +109,11 @@ class LexicalAnalyzer():
               match = False
             else:
               print "ERROR :0 \n"
-              print new
               i = i + 1
               word = ""
               match = False
           else: #letter is not a space
-            if match == True: #the word was valid before the new letter was added, so add old word to tokens
+            if match == True: #the word was valid before the new letter was added, so add old word to tokens            
             #and start over
               self.tokens.append(self.create_token(word, unique_id))
               unique_id = unique_id + 1
@@ -125,6 +124,8 @@ class LexicalAnalyzer():
               i = i + 1
               word = new 
               match = False 
+      if self.is_valid_token(word):
+        self.tokens.append(self.create_token(word, unique_id))
       return self.tokens    
 
   def is_valid_token(self, string):
@@ -148,9 +149,10 @@ class LexicalAnalyzer():
           if string in self.reserved:
             return (id_num, self.reserved[string], string)
 
-          elif self.is_number(string):
-              if self.define == True and len(self.defineName) > 0:
-                self.set_defined_var(string, "NUM_CONST")
+          elif self.is_number(string) == True:
+              if self.define == True:
+                if len(self.defineName) > 0:
+                  self.set_defined_var(string, "NUM_CONST")
               #if an identifier came right before this, then this could be its number value
               return (id_num, "NUM_CONST", string)
 
@@ -165,7 +167,6 @@ class LexicalAnalyzer():
             return (id_num, "STRING_LITERAL", string)
           else:
             print "Error! \n"
-            print string
             return False
         else:
             print "NO"
@@ -199,7 +200,7 @@ class LexicalAnalyzer():
           return False
      
   def set_defined_var(self, string, vartype):
-      literaltable[self.defineName] = (string, vartype)
+      self.literaltable[self.defineName] = (string, vartype)
       self.define = False
       self.defineName = ""
 
@@ -210,3 +211,4 @@ if __name__=="__main__":
       mystring = myfile.read()
     x = LexicalAnalyzer(mystring)
     x.tokenize() 
+    print x.literaltable

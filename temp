@@ -1,0 +1,23 @@
+['exl_declaration', 
+[['INT'], 
+['external_next', 
+[['IDENTIFIER:main'], None]]], 
+['external_declaration', 
+
+    [['choose_declarator_next', [[[]]]], 
+    
+    ['function_definition', [['compound_statement_next', 
+
+        [['declaration_list', 
+
+            [['declaration', [[['INT'], [['init_declarator_list', [['IDENTIFIER:x'], [['ASSIGN_OP'], ['unary_expression', ['5']]]]]]], <bound method ConcreteParseTree.match_declaration_specifiers of <__main__.ConcreteParseTree instance at 0x7f7eb6a41290>>]], 
+
+            [[['INT'], [['init_declarator_list', [['IDENTIFIER:result'], [['ASSIGN_OP'], ['unary_expression', ['1']]]]]]]]]], 
+
+    [['WHILE'], ['relational_expression', ['unary_expression', [['IDENTIFIER:x']], ['G_OP'], 
+    ['unary_expression', ['1']]], 'compound_statement_next', []]]]]]]]], 
+    ['external_declaration', 
+    [['IDENTIFIER:result'], ['function_definition', []]]]]
+
+
+['translation_unit', [['compilerdir_or_external_declaration', [['external_declaration', [['type_specifier', [['INT']]], ['external_next', [['choose_declarator', [['IDENTIFIER:main']]], ['external_next2', []]]]]]]], ['compilerdir_or_external_declaration', [['external_declaration', [['choose_declarator', [['choose_declarator_next', [['OPEN_PAREN'], ['choose_declarator_next1', [['CLOSE_PAREN'], ['choose_declarator_next3', [['choose_declarator', []]]]]]]]]], ['function_definition', [['compound_statement', [['OPEN_BRACE'], ['compound_statement_next', [['declaration_list', [['declaration', [['declaration_specifiers', [['type_qualifier_specifier', [['type_specifier', [['INT']]]]], ['init_declarator_list', [['choose_declarator', [['IDENTIFIER:x']]], ['init_declarator', [['ASSIGN_OP'], ['initializer', [['assignment_expression', [['logical_or_expression', [['logical_and_expression', [['equality_expression', [['relational_expression', [['additive_expression', [['multiplicative_expression', [['unary_expression', [['postfix_expression', [['primary_expression', [['NUM_CONST']]]]]]]]]]]]]]]]]]]]]]]]]]]]], ['SEMICOLON'], <bound method ConcreteParseTree.match_declaration_specifiers of <__main__.ConcreteParseTree instance at 0x7f0cf89b8050>>, <bound method ConcreteParseTree.match_semicolon of <__main__.ConcreteParseTree instance at 0x7f0cf89b8050>>]]]], ['compound_statement_next1', []]]]]]]]]]]], ['compilerdir_or_external_declaration', [['external_declaration', [['type_specifier', [['INT']]], ['external_next', [['choose_declarator', [['IDENTIFIER:result']]], ['external_next2', [['external_init_declarator_list', [['init_declarator', [['ASSIGN_OP'], ['initializer', [['assignment_expression', [['logical_or_expression', [['logical_and_expression', [['equality_expression', [['relational_expression', [['additive_expression', [['multiplicative_expression', [['unary_expression', [['postfix_expression', [['primary_expression', [['NUM_CONST']]]]]]]]]]]]]]]]]]]]]]]]]]], ['SEMICOLON']]]]]]]]]]]
